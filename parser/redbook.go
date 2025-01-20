@@ -39,6 +39,8 @@ func (r redBook) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 	// 获取图集图片地址
 	imagesObjArr := data.Get("imageList").Array()
 	images := make([]string, 0, len(imagesObjArr))
+
+	imagesUrl := make([]string, 0)
 	if len(videoUrl) <= 0 {
 		for _, imageItem := range imagesObjArr {
 			imageUrl := imageItem.Get("urlDefault").String()
@@ -54,14 +56,21 @@ func (r redBook) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 				fmt.Println(newUrl)
 				images = append(images, newUrl)
 			}
+
+			fmt.Println(imageItem.Get("stream.h264.0.masterUrl").String())
+			tmpImageUrl := imageItem.Get("stream.h264.0.masterUrl").String()
+			if len(tmpImageUrl) > 0 {
+				imagesUrl = append(imagesUrl, tmpImageUrl)
+			}
 		}
 	}
 
 	parseInfo := &VideoParseInfo{
-		Title:    data.Get("title").String(),
-		VideoUrl: data.Get("video.media.stream.h264.0.masterUrl").String(),
-		CoverUrl: data.Get("imageList.0.urlDefault").String(),
-		Images:   images,
+		Title:         data.Get("title").String(),
+		VideoUrl:      data.Get("video.media.stream.h264.0.masterUrl").String(),
+		CoverUrl:      data.Get("imageList.0.urlDefault").String(),
+		Images:        images,
+		LiveImagesUrl: imagesUrl,
 	}
 	parseInfo.Author.Uid = data.Get("user.userId").String()
 	parseInfo.Author.Name = data.Get("user.nickname").String()
