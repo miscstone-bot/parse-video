@@ -191,9 +191,12 @@ func (d douYin) parseNoteLiveImages(resBody []byte) ([]string, error) {
 	}
 	douyinNoteUrl := string(redirectNoteFindRes[0])
 
+	cookie := fmt.Sprintf("%v=%v;%v=%v;", DouyinACNonceHeader, "06796360e00bcf7d1f696", DouyinACSignature, "_02B4Z6wo00f01hpfmEgAAIDBSKC4UcxY8gIaf5zAAOEP64")
+
 	client := resty.New()
 	res, err := client.R().
-		SetHeader(HttpHeaderUserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36").
+		SetHeader(HttpHeaderUserAgent, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0").
+		SetHeader(HttpHeaderCookie, cookie).
 		Get(douyinNoteUrl)
 	if err != nil {
 		return nil, err
@@ -227,7 +230,7 @@ func (d douYin) parseNoteLiveImages(resBody []byte) ([]string, error) {
 				if domainIndex == -1 {
 					continue
 				}
-				playApiUrls[idx] = url[domainIndex:]
+				playApiUrls[idx] = "https://" + url[domainIndex:]
 			}
 			return playApiUrls, nil
 		}
