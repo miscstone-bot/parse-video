@@ -28,7 +28,6 @@ func (x xinPianChang) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 		return nil, err
 	}
 	videoJson := doc.Find("#__NEXT_DATA__").Text()
-	//fmt.Println(videoJson)
 
 	data := gjson.Get(videoJson, "props.pageProps.detail")
 	avatar := data.Get("author.userinfo.avatar").String()

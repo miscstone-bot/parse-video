@@ -2,8 +2,10 @@ package parser
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/url"
 	"regexp"
@@ -11,6 +13,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/tidwall/gjson"
+	"github.com/wujunwei928/parse-video/utils"
 )
 
 type douYin struct{}
@@ -88,6 +91,14 @@ func (d douYin) parseVideoID(videoId string) (*VideoParseInfo, error) {
 		d.getRedirectUrl(videoInfo)
 	}
 
+	liveImagesUrl, err := d.parseNoteLiveImages(res.Body())
+	if err != nil {
+		log.Printf("parseNoteLiveImages failed: err=%v", err)
+	}
+
+	if len(liveImagesUrl) > 0 {
+		videoInfo.LiveImagesUrl = liveImagesUrl
+	}
 	return videoInfo, nil
 }
 
@@ -168,6 +179,60 @@ func (d douYin) parseVideoIdFromPath(urlPath string) (string, error) {
 	}
 
 	return "", errors.New("parse video id from path fail")
+}
+
+// parseNoteData 解析douyin动态图片
+func (d douYin) parseNoteLiveImages(resBody []byte) ([]string, error) {
+	redirectNoteUrlRe := regexp.MustCompile(`https://www.douyin.com/note/(\d*)`)
+	redirectNoteFindRes := redirectNoteUrlRe.FindSubmatch(resBody)
+	if len(redirectNoteFindRes) < 2 {
+		fmt.Println("parse note data skip, found no note url")
+		return nil, nil
+	}
+	douyinNoteUrl := string(redirectNoteFindRes[0])
+
+	client := resty.New()
+	res, err := client.R().
+		SetHeader(HttpHeaderUserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36").
+		Get(douyinNoteUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	// Define the regex pattern to match the script content
+	pattern := `<script[^>]*>(.*?)</script>`
+	re := regexp.MustCompile(pattern)
+	matches := re.FindAllStringSubmatch(string(res.Body()), -1)
+
+	targetText := "self.__pace_f.push"
+	for _, match := range matches {
+		if len(match) <= 1 {
+			continue
+		}
+		scriptContent := match[1]
+		if strings.Contains(scriptContent, targetText) && strings.Contains(scriptContent, "awemeId") {
+			targetRes := utils.ExtractBetweenFirstAndLastBraces(scriptContent)
+			targetRes = utils.ParseJsonWithLevel(targetRes, 2)
+
+			playApiListStr := gjson.Get(targetRes, "aweme.detail.images.#.video.playApi")
+
+			var playApiUrls []string
+			err = json.Unmarshal([]byte(playApiListStr.Raw), &playApiUrls)
+			if err != nil {
+				return nil, err
+			}
+
+			for idx, url := range playApiUrls {
+				domainIndex := strings.Index(url, "www.douyin.com")
+				if domainIndex == -1 {
+					continue
+				}
+				playApiUrls[idx] = url[domainIndex:]
+			}
+			return playApiUrls, nil
+		}
+	}
+	return nil, nil
 }
 
 func (d douYin) getRedirectUrl(videoInfo *VideoParseInfo) {

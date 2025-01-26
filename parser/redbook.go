@@ -52,12 +52,9 @@ func (r redBook) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 					spectrumStr = "spectrum/"
 				}
 				newUrl := fmt.Sprintf("https://ci.xiaohongshu.com/%s%s?imageView2/2/w/0/format/jpg", spectrumStr, imgId)
-				fmt.Println(imageUrl)
-				fmt.Println(newUrl)
 				images = append(images, newUrl)
 			}
 
-			fmt.Println(imageItem.Get("stream.h264.0.masterUrl").String())
 			tmpImageUrl := imageItem.Get("stream.h264.0.masterUrl").String()
 			if len(tmpImageUrl) > 0 {
 				imagesUrl = append(imagesUrl, tmpImageUrl)
