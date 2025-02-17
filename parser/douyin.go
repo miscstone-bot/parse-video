@@ -217,7 +217,7 @@ func (d douYin) parseNoteLiveImages(resBody []byte) ([]string, error) {
 			targetRes := utils.ExtractBetweenFirstAndLastBraces(scriptContent)
 			targetRes = utils.ParseJsonWithLevel(targetRes, 2)
 
-			playApiListStr := gjson.Get(targetRes, "aweme.detail.images.#.video.playApi")
+			playApiListStr := gjson.Get(targetRes, "aweme.detail.images.#.video.playAddr.0.src")
 
 			var playApiUrls []string
 			err = json.Unmarshal([]byte(playApiListStr.Raw), &playApiUrls)
@@ -226,11 +226,11 @@ func (d douYin) parseNoteLiveImages(resBody []byte) ([]string, error) {
 			}
 
 			for idx, url := range playApiUrls {
-				domainIndex := strings.Index(url, "www.douyin.com")
+				domainIndex := strings.Index(url, "//")
 				if domainIndex == -1 {
 					continue
 				}
-				playApiUrls[idx] = "https://" + url[domainIndex:]
+				playApiUrls[idx] = "https:" + url[domainIndex:]
 			}
 			return playApiUrls, nil
 		}
