@@ -73,5 +73,6 @@ func (r redBook) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 	parseInfo.Author.Name = data.Get("user.nickname").String()
 	parseInfo.Author.Avatar = data.Get("user.avatar").String()
 
+	parseInfo.VideoSource = VideoSourceXHS
 	return parseInfo, nil
 }

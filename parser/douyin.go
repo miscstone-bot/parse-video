@@ -99,6 +99,7 @@ func (d douYin) parseVideoID(videoId string) (*VideoParseInfo, error) {
 	if len(liveImagesUrl) > 0 {
 		videoInfo.LiveImagesUrl = liveImagesUrl
 	}
+	videoInfo.VideoSource = VideoSourceDouyin
 	return videoInfo, nil
 }
 
@@ -195,7 +196,7 @@ func (d douYin) parseNoteLiveImages(resBody []byte) ([]string, error) {
 
 	client := resty.New()
 	res, err := client.R().
-		SetHeader(HttpHeaderUserAgent, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0").
+		SetHeader(HttpHeaderUserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36 Edg/133.0.0.0").
 		SetHeader(HttpHeaderCookie, cookie).
 		Get(douyinNoteUrl)
 	if err != nil {
