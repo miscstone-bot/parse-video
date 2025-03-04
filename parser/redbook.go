@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"regexp"
-	"strings"
-
 	"github.com/tidwall/gjson"
+	"regexp"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -45,14 +43,15 @@ func (r redBook) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 		for _, imageItem := range imagesObjArr {
 			imageUrl := imageItem.Get("urlDefault").String()
 			if len(imageUrl) > 0 {
-				imgId := strings.Split(imageUrl[strings.LastIndex(imageUrl, "/")+1:], "!")[0]
-				// 如果链接中带有 spectrum/ , 替换域名时需要带上
-				spectrumStr := ""
-				if strings.Contains(imageUrl, "spectrum") {
-					spectrumStr = "spectrum/"
-				}
-				newUrl := fmt.Sprintf("https://ci.xiaohongshu.com/%s%s?imageView2/2/w/0/format/jpg", spectrumStr, imgId)
-				images = append(images, newUrl)
+				//imgId := strings.Split(imageUrl[strings.LastIndex(imageUrl, "/")+1:], "!")[0]
+				//// 如果链接中带有 spectrum/ , 替换域名时需要带上
+				//spectrumStr := ""
+				//if strings.Contains(imageUrl, "spectrum") {
+				//	spectrumStr = "spectrum/"
+				//}
+				//newUrl := fmt.Sprintf("https://ci.xiaohongshu.com/%s%s?imageView2/2/w/0/format/jpg", spectrumStr, imgId)
+				//images = append(images, newUrl)
+				images = append(images, imageUrl)
 			}
 
 			tmpImageUrl := imageItem.Get("stream.h264.0.masterUrl").String()
