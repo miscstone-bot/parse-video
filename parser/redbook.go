@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/tidwall/gjson"
 	"regexp"
+
+	"github.com/tidwall/gjson"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -61,8 +62,11 @@ func (r redBook) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 		}
 	}
 
+	title := data.Get("title").String()
+	desc := data.Get("desc").String()
+
 	parseInfo := &VideoParseInfo{
-		Title:         data.Get("title").String(),
+		Title:         fmt.Sprintf("%v\n%v", title, desc),
 		VideoUrl:      data.Get("video.media.stream.h264.0.masterUrl").String(),
 		CoverUrl:      data.Get("imageList.0.urlDefault").String(),
 		Images:        images,
