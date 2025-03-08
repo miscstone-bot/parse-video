@@ -22,3 +22,6 @@ node_modules
 .netlify
 package.json
 package-lock.json
+*.bat
+*.exe
+parse_video_*.txt
