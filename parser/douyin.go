@@ -20,10 +20,12 @@ type douYin struct{}
 
 func (d douYin) parseVideoID(videoId string) (*VideoParseInfo, error) {
 	reqUrl := fmt.Sprintf("https://www.iesdouyin.com/share/video/%s", videoId)
+	cookie := fmt.Sprintf("%v=%v;%v=%v;", DouyinACNonceHeader, "06796360e00bcf7d1f696", DouyinACSignature, "_02B4Z6wo00f01hpfmEgAAIDBSKC4UcxY8gIaf5zAAOEP64")
 
 	client := resty.New()
 	res, err := client.R().
 		SetHeader(HttpHeaderUserAgent, "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1 Edg/122.0.0.0").
+		SetHeader(HttpHeaderCookie, cookie).
 		Get(reqUrl)
 	if err != nil {
 		return nil, err

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
 	"regexp"
 
 	"github.com/tidwall/gjson"
@@ -15,6 +17,18 @@ type redBook struct{}
 
 func (r redBook) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 	client := resty.New()
+
+	proxyURLStr := "http://d124:d124y@218.78.81.147:29100"
+	proxyURL, err := url.Parse(proxyURLStr)
+	if err == nil {
+		fmt.Println("设置代理：", proxyURL.String())
+	}
+
+	// 设置代理
+	client.SetTransport(&http.Transport{
+		Proxy: http.ProxyURL(proxyURL),
+	})
+
 	videoRes, err := client.R().
 		SetHeader(HttpHeaderUserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0").
 		Get(shareUrl)
