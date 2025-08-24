@@ -18,7 +18,7 @@ type redBook struct{}
 func (r redBook) parseShareUrl(shareUrl string) (*VideoParseInfo, error) {
 	client := resty.New()
 
-	proxyURLStr := "http://d124:d124y@218.78.81.147:29100"
+	proxyURLStr := "http://d124:d124y@221.229.216.73:29100"
 	proxyURL, err := url.Parse(proxyURLStr)
 	if err == nil {
 		fmt.Println("设置代理：", proxyURL.String())

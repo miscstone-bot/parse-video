@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
@@ -23,6 +24,18 @@ func (d douYin) parseVideoID(videoId string) (*VideoParseInfo, error) {
 	cookie := fmt.Sprintf("%v=%v;%v=%v;", DouyinACNonceHeader, "06796360e00bcf7d1f696", DouyinACSignature, "_02B4Z6wo00f01hpfmEgAAIDBSKC4UcxY8gIaf5zAAOEP64")
 
 	client := resty.New()
+
+	proxyURLStr := "http://d124:d124y@221.229.216.73:29100"
+	proxyURL, err := url.Parse(proxyURLStr)
+	if err == nil {
+		fmt.Println("设置代理：", proxyURL.String())
+	}
+
+	// 设置代理
+	client.SetTransport(&http.Transport{
+		Proxy: http.ProxyURL(proxyURL),
+	})
+
 	res, err := client.R().
 		SetHeader(HttpHeaderUserAgent, "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1 Edg/122.0.0.0").
 		SetHeader(HttpHeaderCookie, cookie).
